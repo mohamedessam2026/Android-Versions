@@ -1,0 +1,51 @@
+name: Android Version Monitor Task
+
+on:
+  schedule:
+    - cron: '0 0 1 * *'
+  workflow_dispatch: 
+env:
+  ANDROID_VERSION: ${{ secrets.ANDROID_VERSION }}
+
+jobs:
+  build_and_run:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write 
+      
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' 
+
+      - name: Install Dependencies
+        run: |
+          pip install requests beautifulsoup4 markdownify
+
+      - name: Run Python Script
+        env:
+          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+          SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
+          RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
+        run: python script.py
+
+      - name: Sync and Commit Snapshots
+        run: |
+          git config --global user.name "GitHub Action Bot"
+          git config --global user.email "actions@github.com"
+          
+          FOLDER_NAME="android_${ANDROID_VERSION}_docs_snapshots"
+          
+          echo "Checking folder: $FOLDER_NAME"
+          
+          if [ -d "$FOLDER_NAME" ]; then
+            git add "$FOLDER_NAME/"
+            git diff --quiet && git diff --staged --quiet || (git commit -m "Update $FOLDER_NAME snapshots [Automated]" && git push)
+          else
+            echo "Warning: Folder $FOLDER_NAME not found. Check if the script created it."
+          fi

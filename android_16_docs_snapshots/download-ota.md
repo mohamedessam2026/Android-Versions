@@ -44,7 +44,7 @@ Devices](https://developers.google.com/android/ota).
 
 You can choose to [return to the latest public build](#public) at any time.
 
-**Warning:** Before sdsd an Android 16 OTA image, we strongly recommend that you
+**Warning:** Before applying an Android 16 OTA image, we strongly recommend that you
 [unlock the bootloader](https://source.android.com/docs/core/architecture/bootloader/locking_unlocking) on your device if possible. Unlocking the bootloader
 requires a full device reset that removes all user data on the device, so make
 sure to back up your data first.
